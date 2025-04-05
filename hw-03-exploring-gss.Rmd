@@ -52,6 +52,7 @@ You can load them by running the following in your Console:
 ```{r load-packages, message = FALSE, eval = TRUE}
 library(tidyverse)
 library(dsbox)
+library(tidymodels)
 ```
 
 ## Data
@@ -126,11 +127,12 @@ cat %>%
     Find the mean and the median number of minutes respondents spend on email weekly.
     Is the mean or the median a better measure of the typical among of time Americans spend on email weekly?
     Why?
-
-```{r fig,height=2}
-mutate(email = (emailhr * 60) + emailmin) %>%
-  ggplot(data = email, mapping = aes(x = median)) +
-  geom_histogram()
+    
+```{r}
+cat %>%
+  mutate(email = (emailhr * 60) + emailmin) %>%
+  ggplot(aes(x = email)) +
+  geom_boxplot()
 ```
 
 
@@ -175,9 +177,14 @@ cat %>%
     Interpret the slopes for each of these variables.
     
 ```{r}
-    email_fit <- linear_reg() %>%
+cat %>%
+mutate(snap_insta = ifelse(snapchat == "Yes" | instagrm == "Yes", 'Yes', 'No'), email = (emailhr * 60) + emailmin) %>%
+email_fit <- linear_reg() %>%
   set_engine("lm") %>%
   fit(email ~ educ + wrkstat + snap_insta, data = cat)
+tidy()
+ 
+email_fit
 ```
 
 9.  Create a predicted values vs. residuals plot for this model.
